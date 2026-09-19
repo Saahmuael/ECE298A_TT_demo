@@ -114,12 +114,12 @@ always@(*) begin
     for (integer i = 0; i < 8; i = i + 1) begin
         if (enable_out[i]) begin 
             if (countertype == 2'b10) begin 
-                assign counter_out[i] = count_gray[i];
+                counter_out[i] = count_gray[i];
             end else begin 
-                assign counter_out[i] = count_bin[i];
+                counter_out[i] = count_bin[i];
             end
         end else begin 
-            assign counter_out[i] = 1'bz;
+            counter_out[i] = 1'bz;
         end
     end
 end

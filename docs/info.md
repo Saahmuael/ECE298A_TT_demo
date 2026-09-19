@@ -9,6 +9,8 @@ You can also include images in this folder and reference them in the markdown. E
 
 ## How it works
 
+Note: AI was used to generate much of the formatting and information in this section.
+
 ### Features
 
 - 8-bit up, down, Gray-code, and programmable-step counting

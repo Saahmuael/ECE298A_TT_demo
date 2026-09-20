@@ -40,8 +40,8 @@ always@(posedge clk or negedge rst_n) begin
 end
 assign sync_rstn = rst_chain1;
 
-always @(posedge clk or negedge sync_rstn) begin
-    if (!sync_rstn) begin 
+always @(posedge clk or negedge rst_n) begin
+    if (!sync_rstn | !rst_n) begin 
         shiftin <= {11{1'b0}};
         counter <= 4'b0000;
 

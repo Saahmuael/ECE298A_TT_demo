@@ -52,19 +52,40 @@ async def test_basic_counter(dut):
     cocotb.start_soon(clock.start())
 
     # init inputs
+    dut._log.info(f"uo_out = {dut.uo_out.value}")
     dut.ena.value = 1
     dut.uio_in.value = 0
-    dut.ui_in.value = pack_ui(cs_n=1)
+    dut.ui_in.value = pack_ui(cs_n=1) 
     dut.rst_n.value = 0
 
     await ClockCycles(dut.clk, 5)
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 4)
 
+    print(f"Made it to spi write START")
     await spi_write(dut, START_VALUE, 0)
+    assert (dut.user_project.u_top.u_confinfo.startval.value) == 0, f"expected 0, got {dut.user_project.u_top.u_confinfo.startval.value}"
+
+    print(f"Made it to spi write END")
     await spi_write(dut, END_VALUE, 3)
-    await spi_write(dut, MODE, 0b00 << 6)
+    assert (dut.user_project.u_top.u_confinfo.endval.value) == 3, f"expected {3}, got {dut.user_project.u_top.u_confinfo.endval.value}"
+
+    print(f"Made it to spi write MODE")
+    await spi_write(dut, MODE, 0)
+    assert (dut.user_project.u_top.u_confinfo.countertype.value) == 0, f"expected 0, got {dut.user_project.u_top.u_confinfo.countertype.value}"
+    
+    print(f"Made it to spi write ENABLE")
     await spi_write(dut, OUTPUT_ENABLE, 0xFF)
+    assert (dut.user_project.u_top.u_confinfo.enable_out.value) == 0xFF, f"expected 0xFF, got {dut.user_project.u_top.u_confinfo.operating_vals.value}"
+    
+    dut._log.info(f"cfg            = {dut.user_project.u_top.u_counter.cfg.value}")
+    dut._log.info(f"startval       = {dut.user_project.u_top.u_counter.startval.value}")
+    dut._log.info(f"endval         = {dut.user_project.u_top.u_counter.endval.value}")
+    dut._log.info(f"countertype    = {dut.user_project.u_top.u_counter.countertype.value}")
+    dut._log.info(f"countby        = {dut.user_project.u_top.u_counter.countby.value}")
+    dut._log.info(f"enable_out     = {dut.user_project.u_top.u_counter.enable_out.value}")
+    dut._log.info(f"operating_vals = {dut.user_project.u_top.u_counter.operating_vals.value}")
+    dut._log.info(f"count_bin      = {dut.user_project.u_top.u_counter.count_bin.value}")
 
     # load START_VALUE but remain paused.
     await spi_write(dut, CONTROL, 0x80)
@@ -80,14 +101,14 @@ async def test_basic_counter(dut):
 
     # check increment
     for _ in range(8):
+        dut._log.info(f"uo_out = {dut.uo_out.value}")
         observed = await sample_output(dut)
         expected = 0 if previous >= 3 else previous + 1
 
-        assert observed == expected, (f"Expected {expected}, got {observed}; " 
-                                      f"previous value was {previous}")
+        assert observed == expected, (f"Expected {expected}, got {observed}; previous value was {previous}")
 
         previous = observed
-
+    
     # pause
     await spi_write(dut, CONTROL, 0x00)
     await ReadOnly()
@@ -97,5 +118,4 @@ async def test_basic_counter(dut):
     # confirm no change in value
     for _ in range(4):
         observed = await sample_output(dut)
-        assert observed == held_value, ( f"Counter should be paused at {held_value}, " 
-                                        f"but changed to {observed}")
+        assert observed == held_value, ( f"Counter should be paused at {held_value}; but changed to {observed}")

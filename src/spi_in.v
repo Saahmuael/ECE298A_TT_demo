@@ -27,7 +27,6 @@ reg rst_chain0, rst_chain1;
 reg [10:0] shiftin;
 wire sync_rstn;
 reg [3:0] counter;
-reg word_complete;
 
 //reset async assert, sync deassert
 always@(posedge clk or negedge rst_n) begin 
@@ -100,8 +99,7 @@ always @(posedge clk or negedge sync_rstn) begin
 end
 
 always@(*) begin 
-    word_complete = (counter == 4'd10) && (posedge1 && !posedge2);
-    dout_v = word_complete | dvalid_internal;
+    dout_v = dvalid_internal;
     addr = shiftin[10:8];
     dout = shiftin[7:0];
 end

@@ -54,6 +54,7 @@ always @(posedge clk or negedge sync_rstn) begin
         enable_out <= 8'h00;
         setval_detected <= 1'b0;
         reset_detected <= 1'b0;
+        operating_vals <= 2'b00;
     end else begin 
         if (valid) begin 
             case (addr)

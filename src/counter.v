@@ -46,9 +46,13 @@ end
 assign sync_rstn = rst_chain1;
 
 always @(posedge clk or negedge rst_n) begin
-    if (!rst_n | !sync_rstn) begin
+    if (!rst_n) begin
         count_bin <= 8'h00;
-    end else begin
+    end 
+    else if (!sync_rstn) begin 
+        count_bin <= 8'h00;
+    end 
+    else begin
         if (reset_indc) begin
             count_bin <= startval;
         end else if (setval_indc) begin

@@ -45,24 +45,35 @@ end
 assign sync_rstn = rst_chain1;
 
 always @(posedge clk or negedge rst_n) begin
-    if (!rst_n | !sync_rstn) begin 
-        startval <= 8'h00;
-        setval <= 8'h00;
-        endval <= 8'h00;
-        countertype <= 2'b00;
-        countby <= 5'b00000;
-        enable_out <= 8'h00;
-        setval_detected <= 1'b0;
-        reset_detected <= 1'b0;
-        operating_vals <= 2'b00;
-    end else begin 
+    if (!rst_n) begin 
+        startval            <= 8'h00;
+        setval              <= 8'h00;
+        endval              <= 8'h00;
+        countertype         <= 2'b00;
+        countby             <= 5'b00000;
+        enable_out          <= 8'h00;
+        setval_detected     <= 1'b0;
+        reset_detected      <= 1'b0;
+        operating_vals      <= 2'b00;
+    end else if (!sync_rstn) begin 
+        startval            <= 8'h00;
+        setval              <= 8'h00;
+        endval              <= 8'h00;
+        countertype         <= 2'b00;
+        countby             <= 5'b00000;
+        enable_out          <= 8'h00;
+        setval_detected     <= 1'b0;
+        reset_detected      <= 1'b0;
+        operating_vals      <= 2'b00;
+    end
+    else begin 
         if (valid) begin 
             case (addr)
                 3'b000: begin 
                     startval <= data;
                 end
                 3'b001: begin 
-                    setval <= data;
+                    setval          <= data;
                     setval_detected <= 1'b1;
                 end
                 3'b010: begin 

@@ -41,24 +41,39 @@ end
 assign sync_rstn = rst_chain1;
 
 always @(posedge clk or negedge rst_n) begin
-    if (!sync_rstn | !rst_n) begin 
+    if (!rst_n) begin 
         shiftin <= {11{1'b0}};
         counter <= 4'b0000;
 
         dvalid_internal <= 1'b0;
 
-        posedge0 <= 1'b1;
-        posedge1 <= 1'b1;
-        posedge2 <= 1'b1;
+        posedge0 <= 1'b0;
+        posedge1 <= 1'b0;
+        posedge2 <= 1'b0;
 
-        dat0 <= 1'b1;
-        dat1 <= 1'b1;
+        dat0 <= 1'b0;
+        dat1 <= 1'b0;
 
-        cs0 <= 1'b1;
-        cs1 <= 1'b1;
+        cs0 <= 1'b0;
+        cs1 <= 1'b0;
+    end 
+    else if (!sync_rstn) begin 
+        shiftin <= {11{1'b0}};
+        counter <= 4'b0000;
 
+        dvalid_internal <= 1'b0;
 
-    end else begin 
+        posedge0 <= 1'b0;
+        posedge1 <= 1'b0;
+        posedge2 <= 1'b0;
+
+        dat0 <= 1'b0;
+        dat1 <= 1'b0;
+
+        cs0 <= 1'b0;
+        cs1 <= 1'b0;
+    end 
+    else begin 
 
         //track POSEDGE transition of SCLK
         posedge0 <= sclk;

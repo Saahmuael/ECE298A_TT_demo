@@ -67,7 +67,11 @@ always @(posedge clk or negedge rst_n) begin
         operating_vals      <= 2'b00;
     end
     else begin 
+        setval_detected <= 1'b0;
+        reset_detected  <= 1'b0;
+        
         if (valid) begin 
+            
             case (addr)
                 3'b000: begin 
                     startval <= data;
@@ -97,12 +101,6 @@ always @(posedge clk or negedge rst_n) begin
             endcase
         end
     end 
-    if (setval_detected) begin 
-        setval_detected <= 1'b0;
-    end
-    if (reset_detected) begin 
-        reset_detected <= 1'b0;
-    end
 end
 
 assign ready = 1'b1;

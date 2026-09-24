@@ -15,6 +15,7 @@ wire [40:0] cfg;
 wire        setval_indc;
 wire        reset_indc;
 
+(* keep_hierarchy *)
 spi_in u_spi_in (
     .clk    (clk),
     .rst_n  (rst_n),
@@ -28,6 +29,7 @@ spi_in u_spi_in (
     .conf_r (conf_r)
 );
 
+(* keep_hierarchy *)
 confinfo u_confinfo (
     .clk        (clk),
     .rst_n      (rst_n),
@@ -42,6 +44,7 @@ confinfo u_confinfo (
     .reset_indc (reset_indc)
 );
 
+(* keep_hierarchy *)
 counter u_counter (
     .clk           (clk),
     .rst_n         (rst_n),

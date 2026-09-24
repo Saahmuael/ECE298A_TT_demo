@@ -15,21 +15,20 @@ wire [40:0] cfg;
 wire        setval_indc;
 wire        reset_indc;
 
-(* keep_hierarchy *)
+(* keep_hierarchy = "yes" *)
 spi_in u_spi_in (
     .clk    (clk),
     .rst_n  (rst_n),
     .copi   (copi),
     .sclk   (sclk),
     .cs     (cs),
-
     .addr   (addr),
     .dout   (dout),
     .dout_v (dout_v),
     .conf_r (conf_r)
 );
 
-(* keep_hierarchy *)
+(* keep_hierarchy = "yes" *)
 confinfo u_confinfo (
     .clk        (clk),
     .rst_n      (rst_n),
@@ -44,7 +43,7 @@ confinfo u_confinfo (
     .reset_indc (reset_indc)
 );
 
-(* keep_hierarchy *)
+(* keep_hierarchy = "yes" *)
 counter u_counter (
     .clk           (clk),
     .rst_n         (rst_n),

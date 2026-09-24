@@ -1,6 +1,10 @@
+import os
+
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, RisingEdge, ReadOnly
+
+GATE_LEVEL = os.getenv("GATES", "no").lower() == "yes"
 
 # Configuration register addresses
 START_VALUE   = 0b000
@@ -181,6 +185,47 @@ async def reset_dut(dut):
     await ClockCycles(dut.clk, 4)
 
 
+async def test_gate_level_counter(dut):
+    """Exercise the counter using only signals preserved in the GL netlist."""
+    await spi_write(dut, OUTPUT_ENABLE, 0xFF)
+    await spi_write(dut, CONTROL, STOP)
+    await spi_write(dut, START_VALUE, 0x2D)
+    await spi_write(dut, END_VALUE, 0x31)
+    await spi_write(dut, MODE, MODE_UP)
+    await spi_write(dut, CONTROL, STOP_RESET)
+
+    observed = await sample_output(dut)
+    assert observed == 0x2D, (
+        f"Reset should load 0x2d, got 0x{observed:02x}"
+    )
+
+    await spi_write(dut, SET_VALUE, 0x2F)
+    observed = await sample_output(dut)
+    assert observed == 0x2F, (
+        f"SET_VALUE should load 0x2f, got 0x{observed:02x}"
+    )
+
+    await spi_write(dut, CONTROL, START)
+    samples = [await sample_output(dut) for _ in range(10)]
+
+    for previous, current in zip(samples, samples[1:]):
+        expected = 0x2D if previous >= 0x31 else previous + 1
+        assert current == expected, (
+            f"Expected 0x{expected:02x} after 0x{previous:02x}, "
+            f"got 0x{current:02x}"
+        )
+
+    await spi_write(dut, CONTROL, STOP)
+    held = await sample_output(dut)
+
+    for _ in range(3):
+        observed = await sample_output(dut)
+        assert observed == held, (
+            f"Stopped counter changed from 0x{held:02x} "
+            f"to 0x{observed:02x}"
+        )
+
+
 async def test_spi_regw(dut):
     conf = dut.user_project.u_top.u_confinfo
 
@@ -348,6 +393,10 @@ async def test_counter(dut):
     cocotb.start_soon(clock.start())
 
     await reset_dut(dut)
+
+    if GATE_LEVEL:
+        await test_gate_level_counter(dut)
+        return
 
     model_running = [True]
     model_task = cocotb.start_soon(

@@ -23,7 +23,7 @@ module tt_um_example (
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, clk, rst_n, 1'b0};
 
-  (* keep_hierarchy *) //dont flatten me 
+  (* keep_hierarchy = "yes" *) //dont flatten me 
   top u_top (
     .clk          (clk),
     .rst_n        (rst_n),
